@@ -10,16 +10,16 @@ services:
     ports:
       - 5432:5432
 
-  django-app:
+  backend:
     env_file:
       - ./local.env
     environment:
       - POSTGRES_HOST=postgres
-    build: ./django
+    build: ./backend
     volumes:
-      - ./django:/app
+      - ./backend:/app
     ports:
       - 8000:8000
-    image: django-app
+    image: backend
     depends_on:
       - postgres
