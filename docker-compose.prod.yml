@@ -3,30 +3,28 @@ version: '3.8'
 services:
   postgres:
     image: postgres
-    env_file:
-      - ./dev.env
     volumes:
       - ./data/db:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
   backend:
-    env_file:
-      - ./dev.env
     environment:
       - POSTGRES_HOST=postgres
       - WAIT_HOSTS=postgres:5432
+    env_file:
+      - ./.env
     build:
       context: ./backend
       args:
-        - MODE=dev
+        - MODE=prod
     volumes:
       - ./backend:/app
       - django_static:/app/static
       - django_media:/app/media
     ports:
       - 8000:8000
-    image: backend:dev
+    image: backend
     depends_on:
       - postgres
 
@@ -34,24 +32,26 @@ services:
     build:
       context: ./frontend
       args:
-        - MODE=dev
+        - MODE=prod
+    env_file:
+      - ./.env
     volumes:
-      - ./frontend:/app
-    image: frontend:dev
-    ports:
-      - 3000:80
+      - frontend_build:/app/build
 
   nginx:
     image: nginx
     ports:
       - 80:8080
     volumes:
-      - ./nginx/nginx-dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend_build:/var/www/app
       - django_static:/var/www/django_static
       - django_media:/var/www/django_media
     depends_on:
+      - frontend
       - backend
 
 volumes:
+  frontend_build:
   django_static:
   django_media:

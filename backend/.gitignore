@@ -105,6 +105,8 @@ venv.bak/
 
 # Exclude collected Django static files
 static_collected
+static/
+media/
 
 # Exclude machine-specific vs code settings
 .vscode/settings.json
