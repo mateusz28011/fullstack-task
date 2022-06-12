@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.3-alpine
+    env_file:
+      - ./dev.env
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  # sudo chown -R 5050:5050 ./data/pgadmin
+  pgadmin:
+    env_file:
+      - ./dev.env
+    image: dpage/pgadmin4:6.10
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+    ports:
+      - 5050:80
+
+  backend: &backend
+    env_file:
+      - ./dev.env
+    environment:
+      - POSTGRES_HOST=postgres
+      - WAIT_HOSTS=postgres:5432
+    build:
+      context: ./backend
+      args:
+        - MODE=dev
+    volumes:
+      - ./backend:/app
+      - django_static:/app/static
+      - django_media:/app/media
+    ports:
+      - 8000:8000
+    image: backend:dev
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - MODE=dev
+    volumes:
+      - ./frontend:/app
+    image: frontend:dev
+    ports:
+      - 3000:80
+
+  nginx:
+    image: nginx:1.21.6-alpine
+    ports:
+      - 80:8080
+    volumes:
+      - ./nginx/nginx-dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - django_static:/var/www/django_static
+      - django_media:/var/www/django_media
+    depends_on:
+      - backend
+      - frontend
+  rabbitmq:
+    image: rabbitmq:3.10.5-alpine
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
+    ports:
+      - 5672:5672
+
+  worker:
+    <<: *backend
+    command: python3 manage.py celery_worker_autoreload
+    volumes:
+      - ./backend:/app
+    ports: []
+    entrypoint: ''
+    depends_on:
+      - rabbitmq
+      - postgres
+
+volumes:
+  django_static:
+  django_media:

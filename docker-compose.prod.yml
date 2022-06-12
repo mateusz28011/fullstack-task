@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.3-alpine
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    env_file:
+      - ./.env
+    image: dpage/pgadmin4:6.10
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+    ports:
+      - 5050:80
+
+  backend:
+    environment:
+      - POSTGRES_HOST=postgres
+      - WAIT_HOSTS=postgres:5432
+    env_file:
+      - ./.env
+    build:
+      context: ./backend
+      args:
+        - MODE=prod
+    volumes:
+      - ./backend:/app
+      - django_static:/app/static
+      - django_media:/app/media
+    ports:
+      - 8000:8000
+    image: backend
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - MODE=prod
+    env_file:
+      - ./.env
+    volumes:
+      - frontend_build:/app/build
+
+  nginx:
+    image: nginx:1.21.6-alpine
+    ports:
+      - 80:8080
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend_build:/var/www/app
+      - django_static:/var/www/django_static
+      - django_media:/var/www/django_media
+    depends_on:
+      - frontend
+      - backend
+  
+  rabbitmq:
+    image: rabbitmq:3.10.5-alpine
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
+
+  worker:
+    <<: *backend
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    ports: []
+    entrypoint: ''
+    depends_on:
+      - rabbitmq
+      - postgres
+
+volumes:
+  frontend_build:
+  django_static:
+  django_media:
