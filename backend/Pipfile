@@ -7,6 +7,13 @@ name = "pypi"
 django = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
+djangorestframework = "*"
+dj-rest-auth = {extras = ["with_social"], version = "*"}
+drf-yasg = "*"
+djangorestframework-camel-case = "*"
+django-filter = "*"
+djangorestframework-simplejwt = "*"
+python-dotenv = "*"
 
 [dev-packages]
 black = "*"
