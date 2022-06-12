@@ -10,6 +10,16 @@ services:
     ports:
       - 5432:5432
 
+  # sudo chown -R 5050:5050 ./data/pgadmin
+  pgadmin:
+    env_file:
+      - ./dev.env
+    image: dpage/pgadmin4
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+    ports:
+      - 5050:80
+
   backend:
     env_file:
       - ./dev.env
@@ -51,6 +61,7 @@ services:
       - django_media:/var/www/django_media
     depends_on:
       - backend
+      - frontend
 
 volumes:
   django_static:
