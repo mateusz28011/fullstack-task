@@ -19,6 +19,8 @@ ENTRYPOINT ["./entrypoint.sh"]
 
 FROM base as build-dev
 RUN pipenv install --system --dev
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y procps
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 
 FROM base as build-prod

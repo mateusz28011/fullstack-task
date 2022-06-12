@@ -107,6 +107,7 @@ DATABASES = {
     }
 }
 
+CELERY_BROKER_URL = os.getenv("RABBITMQ_URL")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres
+    image: postgres:14.3-alpine
     env_file:
       - ./dev.env
     volumes:
@@ -14,13 +14,13 @@ services:
   pgadmin:
     env_file:
       - ./dev.env
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:6.10
     volumes:
       - ./data/pgadmin:/var/lib/pgadmin
     ports:
       - 5050:80
 
-  backend:
+  backend: &backend
     env_file:
       - ./dev.env
     environment:
@@ -39,6 +39,7 @@ services:
     image: backend:dev
     depends_on:
       - postgres
+      - rabbitmq
 
   frontend:
     build:
@@ -52,7 +53,7 @@ services:
       - 3000:80
 
   nginx:
-    image: nginx
+    image: nginx:1.21.6-alpine
     ports:
       - 80:8080
     volumes:
@@ -62,6 +63,23 @@ services:
     depends_on:
       - backend
       - frontend
+  rabbitmq:
+    image: rabbitmq:3.10.5-alpine
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
+    ports:
+      - 5672:5672
+
+  worker:
+    <<: *backend
+    command: python3 manage.py celery_worker_autoreload
+    volumes:
+      - ./backend:/app
+    ports: []
+    entrypoint: ''
+    depends_on:
+      - rabbitmq
+      - postgres
 
 volumes:
   django_static:
