@@ -10,6 +10,7 @@ class City(models.Model):
 class WeatherDay(models.Model):
     DAYS_CHOICES = [(i, i) for i in range(-5, 3)]
 
+    date = models.DateField()
     day_number = models.SmallIntegerField(choices=DAYS_CHOICES)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
 
@@ -17,13 +18,24 @@ class WeatherDay(models.Model):
         unique_together = ["city", "day_number"]
 
 
+class WeatherCondition(models.Model):
+    icon = models.CharField(max_length=100)
+    text = models.CharField(max_length=50)
+
+    class Meta:
+        unique_together = ["icon", "text"]
+
+
 class WeatherHour(models.Model):
     HOURS_CHOICES = [(i, i) for i in range(24)]
 
-    hour_number = models.SmallIntegerField(choices=HOURS_CHOICES)
     weather_day = models.ForeignKey(WeatherDay, on_delete=models.CASCADE)
-    condition = models.CharField(max_length=20)
+    weather_condition = models.ForeignKey(
+        WeatherCondition, on_delete=models.SET_NULL, null=True
+    )
+    hour_number = models.SmallIntegerField(choices=HOURS_CHOICES)
     temp_c = models.FloatField()
+    cloud = models.SmallIntegerField()
     chance_of_rain = models.SmallIntegerField()
 
     class Meta:
