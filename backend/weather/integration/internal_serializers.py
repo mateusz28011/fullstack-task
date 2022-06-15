@@ -46,42 +46,68 @@ class WeatherPutInternalSerializer(serializers.Serializer):
             raise serializers.ValidationError("Days numbers must be unique")
         return weather_days
 
+    def __split_weather_day_and_weather_hours(self, weather_days):
+        splited = list(
+            map(
+                lambda weather_day: (weather_day, weather_day.pop("weather_hours")),
+                weather_days,
+            )
+        )
+        splited.sort(
+            key=lambda weather_days_and_weather_hours: weather_days_and_weather_hours[
+                0
+            ]["day_number"]
+        )
+        return splited
+
+    def __prepare_weather_day_for_create(self, weather_days_and_weather_hours, city):
+        for weather_day, _ in weather_days_and_weather_hours:
+            weather_day["city"] = city
+
+    def __prepare_weather_hours_for_create(
+        self, weather_days_and_weather_hours, created_weather_days
+    ):
+        for wd_and_wh, cwd in zip(weather_days_and_weather_hours, created_weather_days):
+            _, weather_hours = wd_and_wh
+            for wh in weather_hours:
+                wh["weather_day"] = cwd
+                weather_condition, _ = WeatherCondition.objects.get_or_create(
+                    **wh["weather_condition"], defaults=wh["weather_condition"]
+                )
+                wh["weather_condition"] = weather_condition
+
+    def __update_weather(self, city, weather_days):
+        pass
+
+    def __create_weather(self, city, weather_days):
+        weather_days_and_weather_hours = self.__split_weather_day_and_weather_hours(
+            weather_days
+        )
+
+        self.__prepare_weather_day_for_create(weather_days_and_weather_hours, city)
+
+        created_weather_days = WeatherDay.objects.bulk_create(
+            [
+                WeatherDay(**weather_day)
+                for weather_day, _ in weather_days_and_weather_hours
+            ]
+        )
+
+        self.__prepare_weather_hours_for_create(
+            weather_days_and_weather_hours, created_weather_days
+        )
+
+        for _, weather_hours in weather_days_and_weather_hours:
+            WeatherHour.objects.bulk_create([WeatherHour(**wh) for wh in weather_hours])
+
     def create(self, validated_data):
         with transaction.atomic():
             city_params = {"name": validated_data["city"]}
-            city, _ = City.objects.get_or_create(**city_params, defaults=city_params)
-            city.save()
+            city, is_city_created = City.objects.get_or_create(defaults=city_params)
 
-            for weather_day in validated_data["weather_days"]:
-                weather_hours = weather_day.pop("weather_hours")
-                weather_day_params = {
-                    "city": city,
-                    **weather_day,
-                }
-
-                wd, _ = WeatherDay.objects.get_or_create(
-                    **weather_day_params, defaults=weather_day_params
-                )
-                wd.save()
-
-                for weather_hour in weather_hours:
-                    print(weather_hour)
-                    weather_hour_params = {**weather_hour, "weather_day": wd}
-                    weather_condition_params = weather_hour_params.pop(
-                        "weather_condition"
-                    )
-
-                    wc, _ = WeatherCondition.objects.get_or_create(
-                        **weather_condition_params, defaults=weather_condition_params
-                    )
-                    wc.save()
-
-                    weather_hour_params["weather_condition"] = wc
-                    wh, _ = WeatherHour.objects.update_or_create(
-                        weather_day=wd,
-                        hour_number=weather_hour["hour_number"],
-                        defaults=weather_hour_params,
-                    )
-                    wh.save()
+            if is_city_created:
+                self.__create_weather(city, validated_data["weather_days"])
+            else:
+                self.__update_weather(city, validated_data["weather_days"])
 
         return {"city": city.name}
