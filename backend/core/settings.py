@@ -212,3 +212,5 @@ JWT_AUTH_REFRESH_COOKIE = "refresh"
 # method from internal serializer throws exception
 FORECAST_DAYS_COUNT = 3
 HISTORY_DAYS_COUNT = 5
+
+WEATHERAPI_KEY = os.getenv("DJANGO_SECRECT_KEY")

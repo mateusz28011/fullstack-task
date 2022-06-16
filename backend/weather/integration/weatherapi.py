@@ -1,14 +1,14 @@
-import json
 from datetime import datetime, timedelta
 
 import requests
+from django.conf import settings
 
 
 class WeatherApi:
     __weather_api_url = "https://api.weatherapi.com/v1/"
     __forecast_url = f"{__weather_api_url}forecast.json"
     __history_url = f"{__weather_api_url}history.json"
-    __api_key = "fd51bb46bbbd4170948144928221206"
+    __api_key = settings.WEATHERAPI_KEY
     __common_params = {"key": __api_key, "alerts": "no", "aqi": "no"}
 
     @classmethod
