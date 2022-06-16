@@ -4,6 +4,8 @@ from rest_framework import serializers
 from ..models import City, WeatherCondition, WeatherDay, WeatherHour
 
 
+# TODO
+# FIX
 # Used Serializer because of unique constraint
 class WeatherConditionInternalSerializer(serializers.Serializer):
     icon = serializers.CharField(max_length=100, required=True)
@@ -53,11 +55,16 @@ class WeatherPutInternalSerializer(serializers.Serializer):
                 weather_days,
             )
         )
+
+        # Making sure that items are sorted ascending
         splited.sort(
             key=lambda weather_days_and_weather_hours: weather_days_and_weather_hours[
                 0
             ]["day_number"]
         )
+        for _, weather_hours in splited:
+            weather_hours.sort(key=lambda weather_hour: weather_hour["hour_number"])
+
         return splited
 
     def __prepare_weather_day_for_create(self, weather_days_and_weather_hours, city):
@@ -77,7 +84,35 @@ class WeatherPutInternalSerializer(serializers.Serializer):
                 wh["weather_condition"] = weather_condition
 
     def __update_weather(self, city, weather_days):
-        pass
+        city_weather_days_qs = city.weatherday_set.order_by("day_number")
+        weather_days_and_weather_hours = self.__split_weather_day_and_weather_hours(
+            weather_days
+        )
+
+        for weather_day_and_weather_hours in weather_days_and_weather_hours:
+            weather_day, weather_hours = weather_day_and_weather_hours
+            city_weather_day_qs = city_weather_days_qs.filter(
+                day_number=weather_day.pop("day_number")
+            )
+            city_weather_days_qs.update(**weather_day)
+
+            city_weather_day = city_weather_day_qs[0]
+            weather_day_hours_qs = city_weather_day.weatherhour_set.order_by(
+                "hour_number"
+            )
+
+            for weather_hour in weather_hours:
+                weather_hour[
+                    "weather_condition"
+                ] = WeatherCondition.objects.get_or_create(
+                    **weather_hour["weather_condition"],
+                    defaults=weather_hour["weather_condition"]
+                )[
+                    0
+                ]
+                weather_day_hours_qs.filter(
+                    hour_number=weather_hour.pop("hour_number")
+                ).update(**weather_hour)
 
     def __create_weather(self, city, weather_days):
         weather_days_and_weather_hours = self.__split_weather_day_and_weather_hours(
@@ -102,8 +137,9 @@ class WeatherPutInternalSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            city_params = {"name": validated_data["city"]}
-            city, is_city_created = City.objects.get_or_create(defaults=city_params)
+            city, is_city_created = City.objects.get_or_create(
+                defaults={"name": validated_data["city"]}
+            )
 
             if is_city_created:
                 self.__create_weather(city, validated_data["weather_days"])
