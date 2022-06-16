@@ -1,10 +1,12 @@
 import copy
 
+from django.conf import settings
 from django.db import transaction
 from rest_framework import serializers
 
 from ..models import City, WeatherCondition, WeatherDay, WeatherHour
 
+MAX_WEATHER_DAYS = settings.HISTORY_DAYS_COUNT + settings.FORECAST_DAYS_COUNT
 
 # TODO
 # FIX
@@ -40,7 +42,10 @@ class WeatherDayInternalSerializer(serializers.ModelSerializer):
 
 class WeatherPutInternalSerializer(serializers.Serializer):
     weather_days = WeatherDayInternalSerializer(
-        many=True, write_only=True, min_length=1, max_length=5
+        many=True,
+        write_only=True,
+        min_length=MAX_WEATHER_DAYS,
+        max_length=MAX_WEATHER_DAYS,
     )
     city = serializers.CharField(max_length=50)
 

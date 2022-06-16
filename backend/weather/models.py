@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.postgres.fields import CICharField
 from django.db import models
 
@@ -9,7 +10,15 @@ class City(models.Model):
 
 
 class WeatherDay(models.Model):
-    Days = models.IntegerChoices("Days", [(str(i), i) for i in range(-5, 3)])
+    Days = models.IntegerChoices(
+        "Days",
+        [
+            (str(i), i)
+            for i in range(
+                -1 * settings.HISTORY_DAYS_COUNT, settings.FORECAST_DAYS_COUNT
+            )
+        ],
+    )
 
     date = models.DateField()
     day_number = models.SmallIntegerField(choices=Days.choices)
