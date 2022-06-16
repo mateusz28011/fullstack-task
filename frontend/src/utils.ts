@@ -11,3 +11,7 @@ export function doesHttpOnlyCookieExist(cookiename: string): boolean {
     return false;
   }
 }
+
+export function getShortDayName(dateStr: string) {
+  return new Date(dateStr).toLocaleString('en-us', { weekday: 'short' });
+}
