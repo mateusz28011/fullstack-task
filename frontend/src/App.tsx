@@ -1,57 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { useColorModeValue } from '@chakra-ui/color-mode';
+import { Container, Flex } from '@chakra-ui/layout';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { useLazyGetLoggedUserQuery } from './app/split/auth';
+import Home from './components/home/Home';
+import Navbar from './components/navbar/Navbar';
+import { doesHttpOnlyCookieExist } from './utils';
+// import SignIn from './components/pages/SignIn';
+// import SignUp from './components/pages/SignUp';
 
 function App() {
+  const location = useLocation();
+  const [trigger] = useLazyGetLoggedUserQuery();
+
+  useEffect(() => {
+    if (doesHttpOnlyCookieExist('refresh')) {
+      trigger();
+      console.log('getUser');
+    }
+  }, [trigger]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Flex flexDir='column' minH='100vh'>
+      <Navbar />
+      <Container
+        flex='1 1 auto'
+        maxW='8xl'
+        py='5'
+        borderX={1}
+        borderStyle={'solid'}
+        borderColor={useColorModeValue('gray.200', 'gray.900')}
+      >
+        <Routes location={location} key={location.pathname}>
+          <Route path='/' element={<Home />} />
+          {/* <Route
+            exact
+            path={[
+              '/datasets/:id',
+              '/datasets/:id/clustering/:clusteringId/algorithm/:algorithmId',
+              '/datasets/:id/clustering/:clusteringId',
+            ]}
           >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+            <Dataset /> */}
+          {/* </Route> */}
+        </Routes>
+      </Container>
+    </Flex>
   );
 }
 
