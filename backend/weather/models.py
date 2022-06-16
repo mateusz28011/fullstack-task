@@ -1,8 +1,9 @@
+from django.contrib.postgres.fields import CICharField
 from django.db import models
 
 
 class City(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = CICharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
