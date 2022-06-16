@@ -205,3 +205,12 @@ REST_SESSION_LOGIN = False
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = "access"
 JWT_AUTH_REFRESH_COOKIE = "refresh"
+
+# TODO
+# FIX
+# If values are changed and city is already in db, update
+# method from internal serializer throws exception
+FORECAST_DAYS_COUNT = 3
+HISTORY_DAYS_COUNT = 5
+
+WEATHERAPI_KEY = os.getenv("DJANGO_SECRECT_KEY")
