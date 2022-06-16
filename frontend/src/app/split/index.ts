@@ -11,7 +11,7 @@ import {
 export type ApiError = { data: any; status: number };
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.REACT_APP_API_URL,
+  baseUrl: process.env.REACT_APP_API_URL || '/api',
   credentials: 'include',
 });
 const baseQueryWithReauth: BaseQueryFn<

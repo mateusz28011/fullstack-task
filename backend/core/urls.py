@@ -15,14 +15,13 @@ Including another URLconf
 """
 from dj_rest_auth.jwt_auth import get_refresh_view
 from dj_rest_auth.registration.views import RegisterView
-from dj_rest_auth.views import LoginView, LogoutView
+from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from rest_framework_simplejwt.views import TokenVerifyView
 from weather.views import GetCityWeather
 
 # TODO
@@ -51,14 +50,13 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("weather/forecast/", GetCityWeather.as_view()),
     path("", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
-    # path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path(
         "dj-rest-auth/",
         include(
             [
+                path("user/", UserDetailsView.as_view(), name="rest_user_details"),
                 path("login/", LoginView.as_view(), name="rest_login"),
                 path("logout/", LogoutView.as_view(), name="rest_logout"),
-                path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
                 path(
                     "token/refresh/", get_refresh_view().as_view(), name="token_refresh"
                 ),

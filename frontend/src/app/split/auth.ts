@@ -54,7 +54,7 @@ export const authApi = emptySplitApi.injectEndpoints({
     }),
     register: build.mutation<RegisterRespone, RegisterRequest>({
       query: (credentials) => ({
-        url: 'dj-rest-auth/registration/',
+        url: 'dj-rest-auth/register/',
         method: 'POST',
         body: credentials,
       }),

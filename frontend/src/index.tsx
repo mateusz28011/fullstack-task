@@ -5,11 +5,12 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
+import { customTheme } from './styles/theme';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ChakraProvider>
+      <ChakraProvider theme={customTheme}>
         <BrowserRouter>
           <App />
         </BrowserRouter>
