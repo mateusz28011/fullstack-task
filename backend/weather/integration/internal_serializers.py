@@ -28,6 +28,7 @@ class WeatherDayInternalSerializer(serializers.ModelSerializer):
     weather_hours = WeatherHourInternalSerializer(
         many=True, min_length=24, max_length=24
     )
+    weather_condition = WeatherConditionInternalSerializer()
 
     class Meta:
         model = WeatherDay
@@ -77,6 +78,10 @@ class WeatherPutInternalSerializer(serializers.Serializer):
     def __prepare_weather_day_for_create(self, weather_days_and_weather_hours, city):
         for weather_day, _ in weather_days_and_weather_hours:
             weather_day["city"] = city
+            weather_day["weather_condition"] = WeatherCondition.objects.get_or_create(
+                **weather_day["weather_condition"],
+                defaults=weather_day["weather_condition"]
+            )[0]
 
     def __prepare_weather_hours_for_create(
         self, weather_days_and_weather_hours, created_weather_days
@@ -101,6 +106,10 @@ class WeatherPutInternalSerializer(serializers.Serializer):
             city_weather_day_qs = city_weather_days_qs.filter(
                 day_number=weather_day.pop("day_number")
             )
+            weather_day["weather_condition"] = WeatherCondition.objects.get_or_create(
+                **weather_day["weather_condition"],
+                defaults=weather_day["weather_condition"]
+            )[0]
             city_weather_days_qs.update(**weather_day)
 
             city_weather_day = city_weather_day_qs[0]

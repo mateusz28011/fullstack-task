@@ -36,15 +36,22 @@ class WeatherApi:
         return hour
 
     @classmethod
+    def __prepare_weather_day(cls, weather_day, index):
+        weather_day["day_number"] = index
+        weather_day["weather_hours"] = list(
+            map(cls.__add_hour_number, weather_day["hour"])
+        )
+        weather_day["maxtemp_c"] = weather_day["day"]["maxtemp_c"]
+        weather_day["mintemp_c"] = weather_day["day"]["mintemp_c"]
+        weather_day["weather_condition"] = weather_day["day"]["condition"]
+
+    @classmethod
     def transform_forecast_response(cls, data):
         parsed_data = []
 
         forecast_days = data["forecast"]["forecastday"]
         for idx, weather_day in enumerate(forecast_days):
-            weather_day["day_number"] = idx
-            weather_day["weather_hours"] = list(
-                map(cls.__add_hour_number, weather_day["hour"])
-            )
+            cls.__prepare_weather_day(weather_day, idx)
 
             parsed_data.append(weather_day)
 
@@ -55,9 +62,6 @@ class WeatherApi:
         weather_day = data["forecast"]["forecastday"][0]
 
         weather_day_date = datetime.fromisoformat(weather_day["date"])
-        weather_day["day_number"] = -(datetime_now - weather_day_date).days
-        weather_day["weather_hours"] = list(
-            map(cls.__add_hour_number, weather_day["hour"])
-        )
+        cls.__prepare_weather_day(weather_day, -(datetime_now - weather_day_date).days)
 
         return weather_day

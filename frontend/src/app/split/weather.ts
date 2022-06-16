@@ -7,7 +7,10 @@ export interface Weather {
 
 export interface WeatherDay {
   date: string;
+  maxtempC: number;
+  mintempC: number;
   dayNumber: number;
+  weatherCondition: WeatherCondition;
   weatherHours: WeatherHour[];
 }
 
