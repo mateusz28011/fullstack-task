@@ -1,3 +1,5 @@
+import copy
+
 from django.db import transaction
 from rest_framework import serializers
 
@@ -137,13 +139,15 @@ class WeatherPutInternalSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         with transaction.atomic():
+            city_params = {"name": validated_data["city"]}
             city, is_city_created = City.objects.get_or_create(
-                defaults={"name": validated_data["city"]}
+                **city_params, defaults=city_params
             )
 
+            weather_days = copy.deepcopy(validated_data["weather_days"])
             if is_city_created:
-                self.__create_weather(city, validated_data["weather_days"])
+                self.__create_weather(city, weather_days)
             else:
-                self.__update_weather(city, validated_data["weather_days"])
+                self.__update_weather(city, weather_days)
 
         return {"city": city.name}
