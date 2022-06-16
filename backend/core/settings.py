@@ -137,7 +137,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 STATIC_URL = "django_static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -212,5 +212,7 @@ JWT_AUTH_REFRESH_COOKIE = "refresh"
 # method from internal serializer throws exception
 FORECAST_DAYS_COUNT = 3
 HISTORY_DAYS_COUNT = 5
+
+HOURS_TO_INVALIDATE_WEATHER = 3
 
 WEATHERAPI_KEY = os.getenv("WEATHERAPI_KEY")

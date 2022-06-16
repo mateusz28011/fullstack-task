@@ -7,8 +7,11 @@ from rest_framework.views import APIView
 
 from .integration.internal_serializers import WeatherPutInternalSerializer
 from .integration.weatherapi import WeatherApi
+from .models import City
+from .serializers import WeatherGetSerializer
 
 
+# 3 hours or another day invalidate
 class GetCityWeather(APIView):
 
     # authentication_classes = [authentication.TokenAuthentication]
@@ -19,8 +22,24 @@ class GetCityWeather(APIView):
         if q is None:
             raise ValidationError({"detail": 'Query parameter "q" is required'})
 
-        history = []
         datetime_now = datetime.now()
+
+        try:
+            city = City.objects.get(name=q)
+        except:
+            pass
+        else:
+            date_after_which_data_is_invalidated = datetime_now - timedelta(
+                hours=settings.HOURS_TO_INVALIDATE_WEATHER
+            )
+            if not (
+                (city.updated_at < date_after_which_data_is_invalidated)
+                or (city.updated_at.day != date_after_which_data_is_invalidated.day)
+            ):
+                serializer = WeatherGetSerializer(city)
+                return Response(serializer.data)
+
+        history = []
         for d in reversed(range(1, settings.HISTORY_DAYS_COUNT + 1)):
             dt = datetime_now - timedelta(days=d)
             history.append(WeatherApi.get_history(q, dt.date()))

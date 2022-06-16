@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 
 from django.conf import settings
 from django.db import transaction
@@ -162,6 +163,8 @@ class WeatherPutInternalSerializer(serializers.Serializer):
             if is_city_created:
                 self.__create_weather(city, weather_days)
             else:
+                city.updated_at = datetime.now()
+                city.save()
                 self.__update_weather(city, weather_days)
 
         return {"city": city.name}
