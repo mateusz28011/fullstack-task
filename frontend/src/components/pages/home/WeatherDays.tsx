@@ -1,19 +1,13 @@
-import { Box, Flex, Stack, Text } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import React from 'react';
-import { Weather, WeatherDay } from '../../../app/split/weather';
-import { getShortDayName } from '../../../utils';
+import { Weather } from '../../../app/split/weather';
+import WeatherDayBox from './WeatherDayBox';
 
 const WeatherDays = ({ data }: { data: Weather | undefined }) => {
-  console.log(data);
   return data ? (
-    <Flex>
+    <Flex justifyContent='center' columnGap={1}>
       {data.weatherDays.map((weatherDay) => (
-        <Box key={weatherDay.dayNumber}>
-          <Stack>
-            <Text>{new Date(weatherDay.date).toISOString()}</Text>
-            <Text>{getShortDayName(weatherDay.date)}</Text>
-          </Stack>
-        </Box>
+        <WeatherDayBox weatherDay={weatherDay} key={weatherDay.dayNumber} />
       ))}
     </Flex>
   ) : null;

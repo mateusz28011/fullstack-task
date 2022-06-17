@@ -15,3 +15,13 @@ export function doesHttpOnlyCookieExist(cookiename: string): boolean {
 export function getShortDayName(dateStr: string) {
   return new Date(dateStr).toLocaleString('en-us', { weekday: 'short' });
 }
+
+export const dateWithoutTime = (date: string | Date) => {
+  if (date instanceof Date) {
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};

@@ -1,6 +1,5 @@
 import {
   Collapse,
-  Flex,
   Radio,
   RadioGroup,
   Stack,
@@ -8,20 +7,16 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import React from 'react';
-
 import { useState } from 'react';
 import SearchCity from './SearchCity';
 import { Box } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
-import { pointer } from '@testing-library/user-event/dist/types/pointer';
 
 type SearchOption = 'city' | 'longitude';
 
 const WeatherSearch = () => {
   const { isOpen, onToggle } = useDisclosure();
   const [searchType, setSearchType] = useState<SearchOption>('city');
-
-  const setCitySearchType = (): void => setSearchType('city');
 
   return (
     <Box
