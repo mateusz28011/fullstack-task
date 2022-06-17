@@ -1,13 +1,13 @@
 import { Flex } from '@chakra-ui/react';
 import React from 'react';
 import { Weather } from '../../../app/split/weather';
-import WeatherDayBox from './WeatherDayBox';
+import WeatherDayItem from './WeatherDayItem';
 
 const WeatherDays = ({ data }: { data: Weather | undefined }) => {
   return data ? (
-    <Flex justifyContent='center' columnGap={1}>
+    <Flex columnGap={1} overflowX='auto' py={4}>
       {data.weatherDays.map((weatherDay) => (
-        <WeatherDayBox weatherDay={weatherDay} key={weatherDay.dayNumber} />
+        <WeatherDayItem weatherDay={weatherDay} key={weatherDay.dayNumber} />
       ))}
     </Flex>
   ) : null;

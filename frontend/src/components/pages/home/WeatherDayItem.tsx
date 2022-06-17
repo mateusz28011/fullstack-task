@@ -12,7 +12,7 @@ import {
   setChoosedDay,
 } from '../../../app/slices/WeatherSlice';
 
-const WeatherDayBox = ({ weatherDay }: { weatherDay: WeatherDay }) => {
+const WeatherDayItem = ({ weatherDay }: { weatherDay: WeatherDay }) => {
   const dispatch = useAppDispatch();
   const choosedDay = useAppSelector(selectChoosedDay);
   const choosedHour = useAppSelector(selectChoosedHour);
@@ -42,6 +42,7 @@ const WeatherDayBox = ({ weatherDay }: { weatherDay: WeatherDay }) => {
       justifyContent='center'
       textAlign='center'
       alignItems='center'
+      flexShrink={0}
       spacing={0}
       onClick={!isChoosed ? changeChoosedDay : undefined}
     >
@@ -61,4 +62,4 @@ const WeatherDayBox = ({ weatherDay }: { weatherDay: WeatherDay }) => {
   );
 };
 
-export default WeatherDayBox;
+export default WeatherDayItem;

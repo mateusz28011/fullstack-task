@@ -39,7 +39,7 @@ const WeatherHours = () => {
         style={{ cursor: 'pointer' }}
       >
         <ReferenceDot
-          r={6}
+          r={3}
           style={{ zIndex: 100, position: 'relative' }}
           x={choosedHour?.hourNumber}
           y={choosedHour?.tempC}
@@ -55,6 +55,7 @@ const WeatherHours = () => {
           ]}
         />
         <XAxis
+          style={{ fontSize: '13px' }}
           dataKey='hourNumber'
           interval='preserveStartEnd'
           minTickGap={8}

@@ -2,7 +2,7 @@ import { emptySplitApi } from './';
 
 export interface Weather {
   weatherDays: WeatherDay[];
-  city: string;
+  name: string;
 }
 
 export interface WeatherDay {
