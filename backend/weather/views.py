@@ -49,10 +49,10 @@ class GetCityWeather(APIView):
         transformed_data = transformed_history + WeatherApi.transform_forecast_response(
             forecast
         )
-        city = forecast["location"]["name"]
+        name = forecast["location"]["name"]
 
         serializer = WeatherPutInternalSerializer(
-            data={"weather_days": transformed_data, "city": city}
+            data={"weather_days": transformed_data, "name": name}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
