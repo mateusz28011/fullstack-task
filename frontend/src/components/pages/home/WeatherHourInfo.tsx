@@ -1,4 +1,4 @@
-import { Box, Flex, Image, Text, Stack } from '@chakra-ui/react';
+import { Flex, Image, Text, Stack } from '@chakra-ui/react';
 import React from 'react';
 import { useAppSelector } from '../../../app/hooks';
 import { selectChoosedHour } from '../../../app/slices/WeatherSlice';

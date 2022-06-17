@@ -49,7 +49,7 @@ class WeatherPutInternalSerializer(serializers.Serializer):
         min_length=MAX_WEATHER_DAYS,
         max_length=MAX_WEATHER_DAYS,
     )
-    city = serializers.CharField(max_length=50)
+    name = serializers.CharField(max_length=50)
 
     def validate_weather_days(self, weather_days):
         days_number_set = set(list(map(lambda wd: wd["day_number"], weather_days)))
@@ -111,7 +111,7 @@ class WeatherPutInternalSerializer(serializers.Serializer):
                 **weather_day["weather_condition"],
                 defaults=weather_day["weather_condition"]
             )[0]
-            city_weather_days_qs.update(**weather_day)
+            city_weather_day_qs.update(**weather_day)
 
             city_weather_day = city_weather_day_qs[0]
             weather_day_hours_qs = city_weather_day.weatherhour_set.order_by(
@@ -154,7 +154,7 @@ class WeatherPutInternalSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            city_params = {"name": validated_data["city"]}
+            city_params = {"name": validated_data["name"]}
             city, is_city_created = City.objects.get_or_create(
                 **city_params, defaults=city_params
             )
@@ -167,4 +167,4 @@ class WeatherPutInternalSerializer(serializers.Serializer):
                 city.save()
                 self.__update_weather(city, weather_days)
 
-        return {"city": city.name}
+        return {"name": city.name}

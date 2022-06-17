@@ -11,11 +11,7 @@ from .models import City
 from .serializers import WeatherGetSerializer
 
 
-# 3 hours or another day invalidate
 class GetCityWeather(APIView):
-
-    # authentication_classes = [authentication.TokenAuthentication]
-    # permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
         q = request.GET.get("q", None)
@@ -23,7 +19,6 @@ class GetCityWeather(APIView):
             raise ValidationError({"detail": 'Query parameter "q" is required'})
 
         datetime_now = datetime.now()
-
         try:
             city = City.objects.get(name=q)
         except:
