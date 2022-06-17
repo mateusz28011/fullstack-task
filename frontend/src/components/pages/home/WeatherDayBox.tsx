@@ -4,6 +4,10 @@ import { WeatherDay } from '../../../app/split/weather';
 import { getShortDayName } from '../../../utils';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
+  selectChoosedHour,
+  setChoosedHour,
+} from '../../../app/slices/WeatherSlice';
+import {
   selectChoosedDay,
   setChoosedDay,
 } from '../../../app/slices/WeatherSlice';
@@ -11,11 +15,20 @@ import {
 const WeatherDayBox = ({ weatherDay }: { weatherDay: WeatherDay }) => {
   const dispatch = useAppDispatch();
   const choosedDay = useAppSelector(selectChoosedDay);
+  const choosedHour = useAppSelector(selectChoosedHour);
   const isChoosed = choosedDay
     ? choosedDay.dayNumber === weatherDay.dayNumber
     : false;
 
-  const changeChoosedDay = () => dispatch(setChoosedDay(weatherDay));
+  const changeChoosedDay = () => {
+    const weatherHourNew = weatherDay.weatherHours.find(
+      (weatherHour) => weatherHour.hourNumber === choosedHour?.hourNumber
+    );
+    if (weatherHourNew) {
+      dispatch(setChoosedDay(weatherDay));
+      dispatch(setChoosedHour(weatherHourNew));
+    }
+  };
 
   return (
     <Stack
