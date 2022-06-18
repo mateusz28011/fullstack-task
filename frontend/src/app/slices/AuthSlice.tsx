@@ -30,6 +30,16 @@ const slice = createSlice({
         (state, action) => {
           state.user = action.payload;
         }
+      )
+      .addMatcher(
+        authApi.endpoints.saveUserCity.matchFulfilled,
+        (state, action) => {
+          if (state.user)
+            state.user.savedCity = {
+              id: action.payload.savedCity,
+              name: state.user?.savedCity?.name || '',
+            };
+        }
       );
   },
 });

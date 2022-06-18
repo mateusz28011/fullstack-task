@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils import timezone
+from weather.models import City
 
 
 class CustomUserManager(BaseUserManager):
@@ -26,6 +27,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     join_date = models.DateTimeField(default=timezone.now)
     is_staff = models.BooleanField(default=False, blank=True)
     is_active = models.BooleanField(default=True, blank=True)
+    saved_city = models.ForeignKey(
+        City, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     objects = CustomUserManager()
 

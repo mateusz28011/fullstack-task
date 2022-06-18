@@ -14,7 +14,9 @@ import {
   useLazyGetWeatherQuery,
 } from '../../../app/split/weather';
 import ApiError from '../../ApiError';
-import { useAppDispatch } from '../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { selectCurrentUser } from '../../../app/slices/AuthSlice';
+import { useEffect } from 'react';
 
 const SearchCity = () => {
   const dispatch = useAppDispatch();
@@ -23,12 +25,21 @@ const SearchCity = () => {
     register,
     formState: { errors },
   } = useForm<GetWeatherRequest>();
-  const [trigger] = useLazyGetWeatherQuery();
+  const [trigger, { isUninitialized }] = useLazyGetWeatherQuery();
+  const user = useAppSelector(selectCurrentUser);
 
   const onSubmit = (data: GetWeatherRequest) => {
     trigger(data);
     dispatch(setLastGetWeatherQueryPayload(data));
   };
+
+  useEffect(() => {
+    if (user?.savedCity?.name && isUninitialized) {
+      const data = { q: user.savedCity.name };
+      trigger(data);
+      dispatch(setLastGetWeatherQueryPayload(data));
+    }
+  }, [user, isUninitialized, dispatch, trigger]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

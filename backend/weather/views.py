@@ -12,27 +12,26 @@ from .serializers import WeatherGetSerializer
 
 
 class GetCityWeather(APIView):
-
     def get(self, request, format=None):
         q = request.GET.get("q", None)
         if q is None:
             raise ValidationError({"detail": 'Query parameter "q" is required'})
 
         datetime_now = datetime.now()
-        try:
-            city = City.objects.get(name=q)
-        except:
-            pass
-        else:
-            date_after_which_data_is_invalidated = datetime_now - timedelta(
-                hours=settings.HOURS_TO_INVALIDATE_WEATHER
-            )
-            if not (
-                (city.updated_at < date_after_which_data_is_invalidated)
-                or (city.updated_at.day != date_after_which_data_is_invalidated.day)
-            ):
-                serializer = WeatherGetSerializer(city)
-                return Response(serializer.data)
+        # try:
+        #     city = City.objects.get(name=q)
+        # except:
+        #     pass
+        # else:
+        #     date_after_which_data_is_invalidated = datetime_now - timedelta(
+        #         hours=settings.HOURS_TO_INVALIDATE_WEATHER
+        #     )
+        #     if not (
+        #         (city.updated_at < date_after_which_data_is_invalidated)
+        #         or (city.updated_at.day != date_after_which_data_is_invalidated.day)
+        #     ):
+        #         serializer = WeatherGetSerializer(city)
+        #         return Response(serializer.data)
 
         history = []
         for d in reversed(range(1, settings.HISTORY_DAYS_COUNT + 1)):
@@ -55,6 +54,6 @@ class GetCityWeather(APIView):
             data={"weather_days": transformed_data, "name": name}
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        city = serializer.save()
 
-        return Response(serializer.validated_data)
+        return Response(WeatherGetSerializer(city).data)

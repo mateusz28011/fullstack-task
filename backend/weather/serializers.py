@@ -19,7 +19,7 @@ class WeatherDaySerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_weather_hours(self, obj):
-        weather_hours = obj.weatherhour_set.all()
+        weather_hours = obj.weatherhour_set.order_by("hour_number").all()
         return WeatherHourSerializer(weather_hours, many=True).data
 
 
@@ -28,7 +28,7 @@ class WeatherGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = City
-        fields = ["name", "weather_days"]
+        fields = ["name", "weather_days", "id"]
         depth = 3
 
     def get_weather_days(self, obj):

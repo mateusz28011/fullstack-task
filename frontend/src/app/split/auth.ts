@@ -1,10 +1,12 @@
 import { emptySplitApi } from './';
+import { City } from './weather';
 
 export interface User {
   id: number;
   email: string;
   joinDate: Date;
   isStaff: boolean;
+  savedCity: City | null;
 }
 
 export interface LoginRequest {
@@ -38,11 +40,26 @@ export interface RegisterRespone {
   detail: string;
 }
 
+export interface saveUserCityRequest {
+  savedCity: number;
+}
+
+export interface saveUserCityResponse extends Omit<User, 'savedCity'> {
+  savedCity: number;
+}
+
 export const authApi = emptySplitApi.injectEndpoints({
   endpoints: (build) => ({
     getLoggedUser: build.query<User, void>({
       query: () => ({
         url: 'dj-rest-auth/user/',
+      }),
+    }),
+    saveUserCity: build.mutation<saveUserCityResponse, saveUserCityRequest>({
+      query: (data) => ({
+        url: 'dj-rest-auth/user/',
+        method: 'PATCH',
+        body: data,
       }),
     }),
     login: build.mutation<LoginResponse, LoginRequest>({
@@ -81,4 +98,5 @@ export const {
   useLazyGetLoggedUserQuery,
   useRefreshTokenMutation,
   useRegisterMutation,
+  useSaveUserCityMutation,
 } = authApi;

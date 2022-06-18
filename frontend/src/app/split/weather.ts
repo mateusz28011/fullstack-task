@@ -1,11 +1,16 @@
 import { emptySplitApi } from './';
 
-export interface Weather {
-  weatherDays: WeatherDay[];
+export interface City {
+  id: number;
   name: string;
 }
 
+export interface CityWithWeather extends City {
+  weatherDays: WeatherDay[];
+}
+
 export interface WeatherDay {
+  id: number;
   date: string;
   maxtempC: number;
   mintempC: number;
@@ -15,6 +20,7 @@ export interface WeatherDay {
 }
 
 export interface WeatherHour {
+  id: number;
   weatherCondition: WeatherCondition;
   hourNumber: number;
   tempC: number;
@@ -23,6 +29,7 @@ export interface WeatherHour {
 }
 
 export interface WeatherCondition {
+  id: number;
   icon: string;
   text: string;
 }
@@ -33,7 +40,7 @@ export interface GetWeatherRequest {
 
 export const weatherApi = emptySplitApi.injectEndpoints({
   endpoints: (build) => ({
-    getWeather: build.query<Weather, GetWeatherRequest>({
+    getWeather: build.query<CityWithWeather, GetWeatherRequest>({
       query: (data) => ({
         url: 'weather/forecast/',
         params: { q: data.q },

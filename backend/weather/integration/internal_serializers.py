@@ -167,4 +167,4 @@ class WeatherPutInternalSerializer(serializers.Serializer):
                 city.save()
                 self.__update_weather(city, weather_days)
 
-        return {"name": city.name}
+        return city

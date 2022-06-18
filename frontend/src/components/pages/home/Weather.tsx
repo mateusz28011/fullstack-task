@@ -12,6 +12,7 @@ import { Box } from '@chakra-ui/react';
 import WeatherDays from './WeatherDays';
 import WeatherHours from './WeatherHours';
 import WeatherHourInfo from './WeatherHourInfo';
+import WeatherSaveCity from './WeatherSaveCity';
 
 const Weather = () => {
   const choosedDay = useAppSelector(selectChoosedDay);
@@ -43,6 +44,7 @@ const Weather = () => {
   return result.data ? (
     <Box maxW='fit-content' mx='auto'>
       <WeatherHourInfo location={result.data.name} />
+      <WeatherSaveCity cityId={result.data.id} />
       <WeatherHours />
       <WeatherDays data={result.data} />
     </Box>

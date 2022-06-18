@@ -19,6 +19,8 @@ const WeatherDayItem = ({ weatherDay }: { weatherDay: WeatherDay }) => {
   const isChoosed = choosedDay
     ? choosedDay.dayNumber === weatherDay.dayNumber
     : false;
+  const isCurrentDate =
+    new Date(weatherDay.date).toDateString() === new Date().toDateString();
 
   const changeChoosedDay = () => {
     const weatherHourNew = weatherDay.weatherHours.find(
@@ -46,7 +48,9 @@ const WeatherDayItem = ({ weatherDay }: { weatherDay: WeatherDay }) => {
       spacing={0}
       onClick={!isChoosed ? changeChoosedDay : undefined}
     >
-      <Text>{getShortDayName(weatherDay.date)}.</Text>
+      <Text fontWeight={isCurrentDate ? 600 : undefined}>
+        {getShortDayName(weatherDay.date)}.
+      </Text>
       <Image
         boxSize='60px'
         src={`https:${weatherDay.weatherCondition.icon}`}

@@ -6,8 +6,8 @@ import { selectChoosedHour } from '../../../app/slices/WeatherSlice';
 const WeatherHourInfo = ({ location }: { location: string }) => {
   const choosedHour = useAppSelector(selectChoosedHour);
 
-  return (
-    <Flex mb={2}>
+  return choosedHour ? (
+    <Flex>
       <Flex alignItems='center' columnGap={2.5} wrap='wrap'>
         <Image
           boxSize='60px'
@@ -42,7 +42,7 @@ const WeatherHourInfo = ({ location }: { location: string }) => {
         </Text>
       </Stack>
     </Flex>
-  );
+  ) : null;
 };
 
 export default WeatherHourInfo;
