@@ -37,6 +37,10 @@ export interface WeatherCondition {
 export interface GetWeatherRequest {
   q: string;
 }
+export interface GetWeatherLotLanRequest {
+  lat: number;
+  lon: number;
+}
 
 export const weatherApi = emptySplitApi.injectEndpoints({
   endpoints: (build) => ({

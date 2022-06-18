@@ -8,7 +8,13 @@ import {
   setChoosedDay,
   setChoosedHour,
 } from '../../../app/slices/WeatherSlice';
-import { Box } from '@chakra-ui/react';
+import {
+  AbsoluteCenter,
+  Box,
+  Center,
+  Spinner,
+  useToast,
+} from '@chakra-ui/react';
 import WeatherDays from './WeatherDays';
 import WeatherHours from './WeatherHours';
 import WeatherHourInfo from './WeatherHourInfo';
@@ -17,6 +23,7 @@ import WeatherSaveCity from './WeatherSaveCity';
 const Weather = () => {
   const choosedDay = useAppSelector(selectChoosedDay);
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const lastGetWeatherQueryPayload = useAppSelector(
     selectLastGetWeatherQueryPayload
   );
@@ -41,14 +48,39 @@ const Weather = () => {
     }
   }, [result, choosedDay, dispatch]);
 
-  return result.data ? (
-    <Box maxW='fit-content' mx='auto'>
-      <WeatherHourInfo location={result.data.name} />
-      <WeatherSaveCity cityId={result.data.id} />
-      <WeatherHours />
-      <WeatherDays data={result.data} />
-    </Box>
-  ) : null;
+  useEffect(() => {
+    if (result.isError) {
+      toast({
+        title: 'Something went wrong!',
+        description: 'Could not fetch weather data',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        variant: 'left-accent',
+        position: 'top',
+      });
+    }
+  }, [result.isError, toast]);
+
+  return !result.isLoading ? (
+    result.data ? (
+      <Box
+        maxW='fit-content'
+        mx='auto'
+        opacity={result.isFetching ? '75%' : undefined}
+        pos='relative'
+      >
+        <WeatherHourInfo location={result.data.name} />
+        <WeatherSaveCity cityId={result.data.id} />
+        <WeatherHours />
+        <WeatherDays data={result.data} />
+      </Box>
+    ) : null
+  ) : (
+    <Center>
+      <Spinner color='blue.500' mx='auto' size='xl' mt={20} />
+    </Center>
+  );
 };
 
 export default Weather;

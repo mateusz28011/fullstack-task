@@ -8,7 +8,10 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { setLastGetWeatherQueryPayload } from '../../../app/slices/WeatherSlice';
+import {
+  selectLastGetWeatherQueryPayload,
+  setLastGetWeatherQueryPayload,
+} from '../../../app/slices/WeatherSlice';
 import {
   GetWeatherRequest,
   useLazyGetWeatherQuery,
@@ -25,8 +28,11 @@ const SearchCity = () => {
     register,
     formState: { errors },
   } = useForm<GetWeatherRequest>();
-  const [trigger, { isUninitialized }] = useLazyGetWeatherQuery();
+  const [trigger, { isUninitialized, isFetching }] = useLazyGetWeatherQuery();
   const user = useAppSelector(selectCurrentUser);
+  const lastGetWeatherQueryPayload = useAppSelector(
+    selectLastGetWeatherQueryPayload
+  );
 
   const onSubmit = (data: GetWeatherRequest) => {
     trigger(data);
@@ -34,16 +40,20 @@ const SearchCity = () => {
   };
 
   useEffect(() => {
-    if (user?.savedCity?.name && isUninitialized) {
+    if (
+      !lastGetWeatherQueryPayload &&
+      user?.savedCity?.name &&
+      isUninitialized
+    ) {
       const data = { q: user.savedCity.name };
       trigger(data);
       dispatch(setLastGetWeatherQueryPayload(data));
     }
-  }, [user, isUninitialized, dispatch, trigger]);
+  }, [user, isUninitialized, dispatch, trigger, lastGetWeatherQueryPayload]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormControl isInvalid={errors.q ? true : false}>
+      <FormControl isInvalid={errors.q ? true : false} isDisabled={isFetching}>
         <InputGroup>
           <Input
             type='text'
@@ -59,6 +69,7 @@ const SearchCity = () => {
           />
           <InputRightElement>
             <IconButton
+              isDisabled={isFetching}
               type='submit'
               aria-label='Search city or region'
               icon={<SearchIcon />}
