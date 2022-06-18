@@ -3,6 +3,14 @@ from django.contrib.postgres.fields import CICharField
 from django.db import models
 
 
+class WeatherCondition(models.Model):
+    icon = models.CharField(max_length=100)
+    text = models.CharField(max_length=50)
+
+    class Meta:
+        unique_together = ["icon", "text"]
+
+
 class City(models.Model):
     name = CICharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -23,17 +31,14 @@ class WeatherDay(models.Model):
     date = models.DateField()
     day_number = models.SmallIntegerField(choices=Days.choices)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
+    weather_condition = models.ForeignKey(
+        WeatherCondition, on_delete=models.SET_NULL, null=True
+    )
+    maxtemp_c = models.FloatField()
+    mintemp_c = models.FloatField()
 
     class Meta:
         unique_together = ["city", "day_number"]
-
-
-class WeatherCondition(models.Model):
-    icon = models.CharField(max_length=100)
-    text = models.CharField(max_length=50)
-
-    class Meta:
-        unique_together = ["icon", "text"]
 
 
 class WeatherHour(models.Model):

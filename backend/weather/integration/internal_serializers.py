@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 
 from django.conf import settings
 from django.db import transaction
@@ -28,6 +29,7 @@ class WeatherDayInternalSerializer(serializers.ModelSerializer):
     weather_hours = WeatherHourInternalSerializer(
         many=True, min_length=24, max_length=24
     )
+    weather_condition = WeatherConditionInternalSerializer()
 
     class Meta:
         model = WeatherDay
@@ -47,7 +49,7 @@ class WeatherPutInternalSerializer(serializers.Serializer):
         min_length=MAX_WEATHER_DAYS,
         max_length=MAX_WEATHER_DAYS,
     )
-    city = serializers.CharField(max_length=50)
+    name = serializers.CharField(max_length=50)
 
     def validate_weather_days(self, weather_days):
         days_number_set = set(list(map(lambda wd: wd["day_number"], weather_days)))
@@ -77,6 +79,10 @@ class WeatherPutInternalSerializer(serializers.Serializer):
     def __prepare_weather_day_for_create(self, weather_days_and_weather_hours, city):
         for weather_day, _ in weather_days_and_weather_hours:
             weather_day["city"] = city
+            weather_day["weather_condition"] = WeatherCondition.objects.get_or_create(
+                **weather_day["weather_condition"],
+                defaults=weather_day["weather_condition"]
+            )[0]
 
     def __prepare_weather_hours_for_create(
         self, weather_days_and_weather_hours, created_weather_days
@@ -101,7 +107,11 @@ class WeatherPutInternalSerializer(serializers.Serializer):
             city_weather_day_qs = city_weather_days_qs.filter(
                 day_number=weather_day.pop("day_number")
             )
-            city_weather_days_qs.update(**weather_day)
+            weather_day["weather_condition"] = WeatherCondition.objects.get_or_create(
+                **weather_day["weather_condition"],
+                defaults=weather_day["weather_condition"]
+            )[0]
+            city_weather_day_qs.update(**weather_day)
 
             city_weather_day = city_weather_day_qs[0]
             weather_day_hours_qs = city_weather_day.weatherhour_set.order_by(
@@ -144,7 +154,7 @@ class WeatherPutInternalSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            city_params = {"name": validated_data["city"]}
+            city_params = {"name": validated_data["name"]}
             city, is_city_created = City.objects.get_or_create(
                 **city_params, defaults=city_params
             )
@@ -153,6 +163,8 @@ class WeatherPutInternalSerializer(serializers.Serializer):
             if is_city_created:
                 self.__create_weather(city, weather_days)
             else:
+                city.updated_at = datetime.now()
+                city.save()
                 self.__update_weather(city, weather_days)
 
-        return {"city": city.name}
+        return city

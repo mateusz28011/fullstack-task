@@ -59,24 +59,24 @@ services:
     depends_on:
       - frontend
       - backend
-  
-  rabbitmq:
-    image: rabbitmq:3.10.5-alpine
-    volumes:
-      - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
-
-  worker:
-    <<: *backend
-    command: celery -A core worker --loglevel=info
-    volumes:
-      - ./backend:/app
-    ports: []
-    entrypoint: ''
-    depends_on:
-      - rabbitmq
-      - postgres
 
 volumes:
   frontend_build:
   django_static:
   django_media:
+
+  # rabbitmq:
+  #   image: rabbitmq:3.10.5-alpine
+  #   volumes:
+  #     - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
+
+  # worker:
+  #   <<: *backend
+  #   command: celery -A core worker --loglevel=info
+  #   volumes:
+  #     - ./backend:/app
+  #   ports: []
+  #   entrypoint: ''
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
