@@ -8,13 +8,7 @@ import {
   setChoosedDay,
   setChoosedHour,
 } from '../../../app/slices/WeatherSlice';
-import {
-  AbsoluteCenter,
-  Box,
-  Center,
-  Spinner,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, Center, Spinner, useToast } from '@chakra-ui/react';
 import WeatherDays from './WeatherDays';
 import WeatherHours from './WeatherHours';
 import WeatherHourInfo from './WeatherHourInfo';

@@ -9,17 +9,29 @@ import Home from './components/pages/home/Home';
 import { HOME_PAGE, LOGIN_PAGE, REGISTER_PAGE } from './paths';
 import Login from './components/pages/login/Login';
 import Register from './components/pages/register/Register';
+import { useLazyGetWeatherQuery } from './app/split/weather';
+import { useAppDispatch } from './app/hooks';
+import { setLastGetWeatherQueryPayload } from './app/slices/WeatherSlice';
 
 function App() {
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const [trigger] = useLazyGetLoggedUserQuery();
+  const [triggerGetWeather] = useLazyGetWeatherQuery();
 
   useEffect(() => {
     if (doesHttpOnlyCookieExist('refresh')) {
       trigger();
-      console.log('getUser');
+    } else {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const q = {
+          q: `${position.coords.latitude},${position.coords.longitude}`,
+        };
+        triggerGetWeather(q);
+        dispatch(setLastGetWeatherQueryPayload(q));
+      });
     }
-  }, [trigger]);
+  }, [trigger, triggerGetWeather, dispatch]);
 
   return (
     <Flex flexDir='column' minH='100vh'>

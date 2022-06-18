@@ -40,7 +40,7 @@ const WeatherSaveCity = ({ cityId }: { cityId: number }) => {
     }
   }, [isError, toast]);
 
-  return !isDefaultCity ? (
+  return !isDefaultCity && user ? (
     <Text
       lineHeight={1}
       mb={2}
