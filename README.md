@@ -2,8 +2,7 @@
 
 ### Clone repository
     git clone https://github.com/mateusz28011/fullstack-task.git
-### Edit dev.env
-Get api key from https://www.weatherapi.com/
+### Get api key from https://www.weatherapi.com/ and edit dev.env
     WEATHERAPI_KEY=<put_weather_api_key_here>
 ### Build docker images
     docker-compose build
