@@ -39,7 +39,6 @@ services:
     image: backend:dev
     depends_on:
       - postgres
-      - rabbitmq
 
   frontend:
     build:
@@ -63,24 +62,24 @@ services:
     depends_on:
       - backend
       - frontend
-  rabbitmq:
-    image: rabbitmq:3.10.5-alpine
-    volumes:
-      - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
-    ports:
-      - 5672:5672
-
-  worker:
-    <<: *backend
-    command: python3 manage.py celery_worker_autoreload
-    volumes:
-      - ./backend:/app
-    ports: []
-    entrypoint: ''
-    depends_on:
-      - rabbitmq
-      - postgres
 
 volumes:
   django_static:
   django_media:
+
+  # rabbitmq:
+  #   image: rabbitmq:3.10.5-alpine
+  #   volumes:
+  #     - ./data/rabbitmq:/var/lib/rabbitmq/mnesia
+  #   ports:
+  #     - 5672:5672
+  # worker:
+  #   <<: *backend
+  #   command: python3 manage.py celery_worker_autoreload
+  #   volumes:
+  #     - ./backend:/app
+  #   ports: []
+  #   entrypoint: ''
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
